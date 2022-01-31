@@ -1,9 +1,9 @@
 package one.digitalinnovation.personapi.controller;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import one.digitalinnovation.personapi.dto.request.PersonDTO;
 import one.digitalinnovation.personapi.dto.response.MessageResponseDTO;
+import one.digitalinnovation.personapi.exception.PersonNotFoundException;
 import one.digitalinnovation.personapi.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 @RestController
 @RequestMapping("/api/v1/people")
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PersonController {
 
-    private PersonService personService;
+    private final PersonService personService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -25,8 +25,26 @@ public class PersonController {
         return personService.create(personDTO);
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public PersonDTO findById(@PathVariable Long id) throws PersonNotFoundException {
+        return personService.findById(id);
+    }
+
     @GetMapping
-    public List<PersonDTO> listAll(){
+    public List<PersonDTO> listAll() {
         return personService.listAll();
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public MessageResponseDTO update(@PathVariable Long id, @RequestBody @Valid PersonDTO personDTO) throws PersonNotFoundException {
+        return personService.update(id, personDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) throws PersonNotFoundException {
+        personService.delete(id);
     }
 }
